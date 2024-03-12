@@ -181,7 +181,7 @@
 					class="text-base-body-13 text-semibold commit-box__textarea"
 					rows="1"
 					disabled={isGeneratingCommitMessage}
-					placeholder="Commit title"
+					placeholder="Commit summary"
 				/>
 
 				{#if commitMessageSet.title.length > 0}
