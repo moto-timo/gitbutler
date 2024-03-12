@@ -17,7 +17,7 @@
 	import { persisted } from '$lib/persisted/persisted';
 	import * as toasts from '$lib/utils/toasts';
 	import { tooltip } from '$lib/utils/tooltip';
-	import { useAutoHeight } from '$lib/utils/useAutoHeight';
+	import { setAutoHeight, useAutoHeight } from '$lib/utils/useAutoHeight';
 	import { invoke } from '@tauri-apps/api/tauri';
 	import { createEventDispatcher } from 'svelte';
 	import { quintOut } from 'svelte/easing';
@@ -45,9 +45,25 @@
 	const currentCommitMessage = projectCurrentCommitMessage(projectId, branch.id);
 	export const expanded = persisted<boolean>(false, 'commitBoxExpanded_' + branch.id);
 
+	function getCommitMessageTitleAndDescription(commitMessage: string) {
+		// Split the commit message into title and description
+		// get the first line as title and the rest as description
+		const [title, ...description] = commitMessage.split('\n');
+		return {
+			title: title,
+			description: description.join('\n')
+		};
+	}
+
+	function concatCommitMessage(message: { title: string; description: string }) {
+		return `${message.title}\n${message.description}`;
+	}
+
 	let commitMessage: string = get(currentCommitMessage) || '';
+	let commitMessageSet = getCommitMessageTitleAndDescription(commitMessage);
 	let isCommitting = false;
 	let textareaElement: HTMLTextAreaElement;
+	let secondTextareaElement: HTMLTextAreaElement;
 	$: if (textareaElement && commitMessage && expanded) {
 		textareaElement.style.height = 'auto';
 		textareaElement.style.height = `${textareaElement.scrollHeight + 2}px`;
@@ -58,6 +74,7 @@
 	}
 
 	function commit() {
+		console.log('commitMessage', commitMessage);
 		if (!commitMessage) return;
 		isCommitting = true;
 		branchController
@@ -74,6 +91,7 @@
 	}
 
 	let summarizer: Summarizer | undefined;
+
 	$: if (user) {
 		const aiProvider = new ButlerAIProvider(cloud, user);
 
@@ -123,30 +141,80 @@
 	const commitGenerationUseEmojis = projectCommitGenerationUseEmojis(projectId);
 
 	let contextMenu: ContextMenu;
+
+	// $: if (commitMessage) {
+	// 	console.log('commitMessage', commitMessage);
+	// }
+
+	$: if (commitMessageSet.title.length > 0) {
+		console.log('commitMessageSet.title', commitMessageSet.title);
+		commitMessage = concatCommitMessage(commitMessageSet);
+	}
+	$: if (commitMessageSet.title.length == 0 && commitMessageSet.description.length > 0) {
+		const messageSet = getCommitMessageTitleAndDescription(commitMessageSet.description);
+		commitMessageSet.title = messageSet.title;
+		commitMessageSet.description = messageSet.description;
+	}
 </script>
 
 <div class="commit-box" class:commit-box__expanded={$expanded}>
 	{#if $expanded}
 		<div class="commit-box__expander" transition:slide={{ duration: 150, easing: quintOut }}>
-			<div class="commit-box__textarea-wrapper">
+			<div class="commit-box__textarea-wrapper text-input">
 				<textarea
 					bind:this={textareaElement}
-					bind:value={commitMessage}
+					bind:value={commitMessageSet.title}
 					use:focusTextareaOnMount
 					on:input={useAutoHeight}
 					on:focus={useAutoHeight}
-					on:change={() => currentCommitMessage.set(commitMessage)}
 					on:keydown={(e) => {
 						if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
 							commit();
 						}
+
+						if (e.key === 'Tab' || e.key === 'Enter') {
+							e.preventDefault();
+							secondTextareaElement.focus();
+						}
 					}}
 					spellcheck={false}
-					class="text-input text-base-body-13 commit-box__textarea"
+					class="text-base-body-13 text-semibold commit-box__textarea"
 					rows="1"
 					disabled={isGeneratingCommitMessage}
-					placeholder="Your commit message here"
+					placeholder="Commit title"
 				/>
+
+				{#if commitMessageSet.title.length > 0}
+					<textarea
+						bind:this={secondTextareaElement}
+						bind:value={commitMessageSet.description}
+						on:input={useAutoHeight}
+						on:focus={useAutoHeight}
+						use:setAutoHeight
+						spellcheck={false}
+						class="text-base-body-13 commit-box__textarea"
+						rows="1"
+						disabled={isGeneratingCommitMessage}
+						placeholder="Commit description (optional)"
+						on:keydown={(e) => {
+							if (commitMessageSet.description.length == 0 && e.key === 'Backspace') {
+								e.preventDefault();
+								textareaElement.focus();
+							}
+
+							// select previous textarea on cmd+a if this textarea is empty
+							if (
+								e.key === 'a' &&
+								(e.metaKey || e.ctrlKey) &&
+								commitMessageSet.description.length == 0
+							) {
+								e.preventDefault();
+								textareaElement.focus();
+								textareaElement.setSelectionRange(0, textareaElement.value.length);
+							}
+						}}
+					/>
+				{/if}
 
 				<div
 					class="commit-box__texarea-actions"
@@ -167,16 +235,27 @@
 							<ContextMenuSection>
 								<ContextMenuItem
 									label="Extra concise"
-									on:click={() => ($commitGenerationExtraConcise = !$commitGenerationExtraConcise)}
+									on:click={() =>
+										($commitGenerationExtraConcise =
+											!$commitGenerationExtraConcise)}
 								>
-									<Checkbox small slot="control" bind:checked={$commitGenerationExtraConcise} />
+									<Checkbox
+										small
+										slot="control"
+										bind:checked={$commitGenerationExtraConcise}
+									/>
 								</ContextMenuItem>
 
 								<ContextMenuItem
 									label="Use emojis 😎"
-									on:click={() => ($commitGenerationUseEmojis = !$commitGenerationUseEmojis)}
+									on:click={() =>
+										($commitGenerationUseEmojis = !$commitGenerationUseEmojis)}
 								>
-									<Checkbox small slot="control" bind:checked={$commitGenerationUseEmojis} />
+									<Checkbox
+										small
+										slot="control"
+										bind:checked={$commitGenerationUseEmojis}
+									/>
 								</ContextMenuItem>
 							</ContextMenuSection>
 						</ContextMenu>
@@ -237,17 +316,23 @@
 		position: relative;
 		display: flex;
 		flex-direction: column;
+		gap: var(--space-4);
+		padding: var(--space-12) var(--space-12) var(--space-48) var(--space-12);
 	}
 	.commit-box__textarea {
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
 
-		padding: var(--space-12) var(--space-12) var(--space-48) var(--space-12);
+		/* padding: var(--space-12) var(--space-12) var(--space-48) var(--space-12); */
 		align-items: flex-end;
 		gap: var(--space-16);
 
 		resize: none;
+
+		&:focus {
+			outline: none;
+		}
 	}
 	.commit-box__texarea-actions {
 		position: absolute;
