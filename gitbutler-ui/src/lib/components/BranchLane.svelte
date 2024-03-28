@@ -38,7 +38,11 @@
 
 	function setSelected(files: AnyFile[], branch: Branch) {
 		if (files.length == 0) return undefined;
-		if (files.length == 1 && files[0] instanceof RemoteFile) return files[0];
+		// unselect if multiple files selected
+		if (files.length > 1) {
+			return undefined;
+		}
+		// if (files.length == 1 && files[0] instanceof RemoteFile) return files[0];
 
 		// If regular file selected but not found in branch files then clear selection.
 		const match = branch.files?.find((f) => files[0].id == f.id);

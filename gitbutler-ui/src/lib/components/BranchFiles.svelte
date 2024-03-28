@@ -3,6 +3,7 @@
 	import BranchFilesList from './BranchFilesList.svelte';
 	import FileTree from './FileTree.svelte';
 	import { filesToFileTree } from '$lib/vbranches/filetree';
+	import { sortLikeFileTree } from '$lib/vbranches/filetree';
 	import type { Ownership } from '$lib/vbranches/ownership';
 	import type { LocalFile, RemoteFile } from '$lib/vbranches/types';
 	import type { Writable } from 'svelte/store';
@@ -18,6 +19,12 @@
 	export let readonly: boolean;
 
 	let selectedListMode: string;
+
+	function unselectAllFiles() {
+		selectedFiles.set([]);
+	}
+
+	$: sortedFiles = sortLikeFileTree(files);
 </script>
 
 <div class="branch-files" class:isUnapplied>
@@ -25,13 +32,23 @@
 		<BranchFilesHeader {files} {selectedOwnership} {showCheckboxes} bind:selectedListMode />
 	</div>
 	{#if files.length > 0}
-		<div class="files-padding">
+		<div
+			role="listbox"
+			tabindex="-1"
+			class="files-container"
+			on:keydown={(e) => {
+				if (e.key === 'Escape') {
+					unselectAllFiles();
+				}
+			}}
+			on:click={unselectAllFiles}
+		>
 			{#if selectedListMode == 'list'}
 				<BranchFilesList
 					{allowMultiple}
 					{readonly}
 					{branchId}
-					{files}
+					{sortedFiles}
 					{selectedOwnership}
 					{selectedFiles}
 					{showCheckboxes}
@@ -48,7 +65,7 @@
 					{selectedOwnership}
 					{selectedFiles}
 					{isUnapplied}
-					{files}
+					{sortedFiles}
 				/>
 			{/if}
 		</div>
@@ -58,6 +75,8 @@
 <style lang="postcss">
 	.branch-files {
 		flex: 1;
+		display: flex;
+		flex-direction: column;
 		background: var(--clr-theme-container-light);
 		border-radius: var(--radius-m) var(--radius-m) 0 0;
 
@@ -71,7 +90,8 @@
 		padding-left: var(--size-14);
 		padding-right: var(--size-14);
 	}
-	.files-padding {
+	.files-container {
+		flex: 1;
 		padding-top: 0;
 		padding-bottom: var(--size-12);
 		padding-left: var(--size-14);

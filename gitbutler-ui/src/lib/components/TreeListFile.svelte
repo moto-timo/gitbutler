@@ -108,10 +108,6 @@
 	.draggable-wrapper {
 		display: inline-block;
 		width: 100%;
-		margin-bottom: var(--size-2);
-		&:last-child {
-			margin-bottom: 0;
-		}
 	}
 	.tree-list-file {
 		display: inline-flex;
@@ -124,6 +120,7 @@
 		max-width: 100%;
 		outline: none;
 		background: var(--clr-theme-container-light);
+		border: 1px solid var(--clr-theme-container-light);
 		&:not(.selected):hover {
 			background-color: color-mix(
 				in srgb,

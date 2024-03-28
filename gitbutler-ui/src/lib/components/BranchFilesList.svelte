@@ -1,21 +1,19 @@
 <script lang="ts">
 	import FileListItem from './FileListItem.svelte';
+	import { selectFilesInList } from '$lib/utils/selectFilesInList';
 	import { maybeMoveSelection } from '$lib/utils/selection';
-	import { sortLikeFileTree } from '$lib/vbranches/filetree';
 	import type { Ownership } from '$lib/vbranches/ownership';
 	import type { AnyFile } from '$lib/vbranches/types';
 	import type { Writable } from 'svelte/store';
 
 	export let branchId: string;
-	export let files: AnyFile[];
+	export let sortedFiles: AnyFile[];
 	export let selectedOwnership: Writable<Ownership>;
 	export let isUnapplied = false;
 	export let showCheckboxes = false;
 	export let selectedFiles: Writable<AnyFile[]>;
 	export let allowMultiple = false;
 	export let readonly = false;
-
-	$: sortedFiles = sortLikeFileTree(files);
 </script>
 
 {#each sortedFiles as file (file.id)}
@@ -29,16 +27,7 @@
 		showCheckbox={showCheckboxes}
 		selected={$selectedFiles.includes(file)}
 		on:click={(e) => {
-			const isAlreadySelected = $selectedFiles.includes(file);
-			if (isAlreadySelected && e.shiftKey) {
-				selectedFiles.update((fileIds) => fileIds.filter((f) => f.id != file.id));
-			} else if (isAlreadySelected) {
-				$selectedFiles = [];
-			} else if (e.shiftKey && allowMultiple) {
-				selectedFiles.update((files) => [file, ...files]);
-			} else {
-				$selectedFiles = [file];
-			}
+			$selectedFiles = selectFilesInList(e, file, $selectedFiles, sortedFiles, allowMultiple);
 		}}
 		on:keydown={(e) => {
 			e.preventDefault();
