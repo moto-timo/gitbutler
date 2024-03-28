@@ -7,10 +7,10 @@
 	import { draggable } from '$lib/dragging/draggable';
 	import { draggableHunk } from '$lib/dragging/draggables';
 	import { SETTINGS_CONTEXT, type SettingsStore } from '$lib/settings/userSettings';
-	import { getContextByClass } from '$lib/utils/context';
+	import { getContextByClass, getContextStore } from '$lib/utils/context';
+	import { Ownership } from '$lib/vbranches/ownership';
 	import { getContext, onDestroy } from 'svelte';
 	import type { HunkSection } from '$lib/utils/fileSections';
-	import type { Ownership } from '$lib/vbranches/ownership';
 	import type { Hunk } from '$lib/vbranches/types';
 	import type { Writable } from 'svelte/store';
 
@@ -24,9 +24,9 @@
 	export let isUnapplied: boolean;
 	export let isFileLocked: boolean;
 	export let readonly: boolean = false;
-	export let selectedOwnership: Writable<Ownership> | undefined = undefined;
 	export let linesModified: number;
 
+	const selectedOwnership: Writable<Ownership> = getContextStore(Ownership);
 	const userSettings = getContext(SETTINGS_CONTEXT) as SettingsStore;
 	const project = getContextByClass(Project);
 

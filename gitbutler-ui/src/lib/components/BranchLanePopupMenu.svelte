@@ -9,13 +9,12 @@
 	import { projectAiGenEnabled } from '$lib/config/config';
 	import { UserService } from '$lib/stores/user';
 	import { normalizeBranchName } from '$lib/utils/branch';
-	import { getContextByClass } from '$lib/utils/context';
+	import { getContextByClass, getContextStore } from '$lib/utils/context';
 	import { BranchController } from '$lib/vbranches/branchController';
+	import { Branch } from '$lib/vbranches/types';
 	import { createEventDispatcher } from 'svelte';
 	import type { User } from '$lib/backend/cloud';
-	import type { Branch } from '$lib/vbranches/types';
 
-	export let branch: Branch;
 	export let projectId: string;
 	export let visible: boolean;
 	export let isUnapplied = false;
@@ -24,6 +23,8 @@
 	const aiService = getContextByClass(AIService);
 	const userService = getContextByClass(UserService);
 	const user = userService.user;
+	const branchStore = getContextStore(Branch);
+	$: branch = $branchStore;
 
 	let deleteBranchModal: Modal;
 	let renameRemoteModal: Modal;

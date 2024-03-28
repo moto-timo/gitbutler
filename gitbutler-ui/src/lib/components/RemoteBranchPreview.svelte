@@ -7,8 +7,7 @@
 	import CommitCard from '$lib/components/CommitCard.svelte';
 	import { type SettingsStore, SETTINGS_CONTEXT } from '$lib/settings/userSettings';
 	import { getRemoteBranchData } from '$lib/stores/remoteBranches';
-	import { getContextByClass, getContextStoreByClass } from '$lib/utils/context';
-	import { Ownership } from '$lib/vbranches/ownership';
+	import { getContextByClass, getContextStore } from '$lib/utils/context';
 	import { BaseBranch, type AnyFile, type RemoteBranch } from '$lib/vbranches/types';
 	import lscache from 'lscache';
 	import { marked } from 'marked';
@@ -20,7 +19,7 @@
 	export let pr: PullRequest | undefined;
 
 	const project = getContextByClass(Project);
-	const baseBranch = getContextStoreByClass(BaseBranch);
+	const baseBranch = getContextStore(BaseBranch);
 
 	const defaultBranchWidthRem = 30;
 	const laneWidthKey = 'branchPreviewLaneWidth';
@@ -30,7 +29,6 @@
 	let rsViewport: HTMLDivElement;
 	let laneWidth: number;
 
-	$: selectedOwnership = writable(Ownership.default());
 	$: selected = setSelected($selectedFiles);
 
 	function setSelected(files: AnyFile[]) {
@@ -97,7 +95,6 @@
 				conflicted={selected.conflicted}
 				branchId={'blah'}
 				file={selected}
-				{selectedOwnership}
 				isUnapplied={false}
 				readonly={true}
 				on:close={() => {

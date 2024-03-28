@@ -6,7 +6,7 @@
 	import BranchLane from '$lib/components/BranchLane.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import { cloneWithRotation } from '$lib/dragging/draggable';
-	import { getContextByClass, getContextStoreByClass } from '$lib/utils/context';
+	import { getContextByClass, getContextStore } from '$lib/utils/context';
 	import { BranchController } from '$lib/vbranches/branchController';
 	import { BaseBranch, type Branch } from '$lib/vbranches/types';
 	import { open } from '@tauri-apps/api/shell';
@@ -15,7 +15,7 @@
 	export let branchesError: any;
 
 	const branchController = getContextByClass(BranchController);
-	const baseBranch = getContextStoreByClass(BaseBranch);
+	const baseBranch = getContextStore(BaseBranch);
 	const project = getContextByClass(Project);
 
 	let dragged: any;
@@ -101,7 +101,7 @@
 					clone?.remove();
 				}}
 			>
-				<BranchLane {branch} branchCount={branches.filter((c) => c.active).length} />
+				<BranchLane {branch} />
 			</div>
 		{/each}
 

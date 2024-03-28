@@ -6,9 +6,19 @@
 	import { projectLaneCollapsed } from '$lib/config/config';
 	import { persisted } from '$lib/persisted/persisted';
 	import { SETTINGS_CONTEXT, type SettingsStore } from '$lib/settings/userSettings';
-	import { getContextByClass } from '$lib/utils/context';
+	import { getRemoteBranchData } from '$lib/stores/remoteBranches';
+	import { getContextByClass, setContextStore } from '$lib/utils/context';
 	import { Ownership } from '$lib/vbranches/ownership';
-	import { RemoteFile, type Branch, type LocalFile, type AnyFile } from '$lib/vbranches/types';
+	import {
+		RemoteFile,
+		Branch,
+		type LocalFile,
+		type AnyFile,
+		LOCAL_COMMITS,
+		REMOTE_COMMITS,
+		INTEGRATED_COMMITS,
+		UNKNOWN_COMMITS
+	} from '$lib/vbranches/types';
 	import lscache from 'lscache';
 	import { getContext } from 'svelte';
 	import { quintOut } from 'svelte/easing';
@@ -17,10 +27,36 @@
 
 	export let branch: Branch;
 	export let isUnapplied = false;
-	export let branchCount = 1;
 
-	$: selectedOwnership = writable(Ownership.fromBranch(branch));
+	const selectedOwnership = Ownership.fromBranch(branch);
+	$: setContextStore(Ownership, selectedOwnership);
 	$: selected = setSelected($selectedFiles, branch);
+
+	$: setContextStore(Branch, branch);
+	$: setContextStore(
+		LOCAL_COMMITS,
+		branch.commits.filter((c) => c.status == 'local')
+	);
+	$: setContextStore(
+		REMOTE_COMMITS,
+		branch.commits.filter((c) => c.status == 'remote')
+	);
+	$: setContextStore(
+		INTEGRATED_COMMITS,
+		branch.commits.filter((c) => c.status == 'integrated')
+	);
+
+	// Set the store immediately so it can be updated later.
+	setContextStore(UNKNOWN_COMMITS, []);
+	$: if (branch.upstreamName) loadRemoteBranch(branch.upstreamName);
+
+	async function loadRemoteBranch(name: string) {
+		const remoteBranchData = await getRemoteBranchData(project.id, name);
+		const unknownCommits = remoteBranchData?.commits.filter(
+			(remoteCommit) => !branch.commits.find((commit) => remoteCommit.id == commit.id)
+		);
+		setContextStore(UNKNOWN_COMMITS, unknownCommits);
+	}
 
 	const project = getContextByClass(Project);
 	const selectedFiles = writable<LocalFile[]>([]);
@@ -58,15 +94,7 @@
 	class:target-branch={branch.active && branch.selectedForChanges}
 	class:file-selected={selected}
 >
-	<BranchCard
-		{branch}
-		{isUnapplied}
-		{selectedOwnership}
-		{commitBoxOpen}
-		bind:isLaneCollapsed
-		{branchCount}
-		{selectedFiles}
-	/>
+	<BranchCard {isUnapplied} {commitBoxOpen} bind:isLaneCollapsed {selectedFiles} />
 
 	{#if selected}
 		<div
@@ -79,9 +107,7 @@
 				conflicted={selected.conflicted}
 				branchId={branch.id}
 				file={selected}
-				{selectedOwnership}
 				{isUnapplied}
-				branchCommits={branch.commits}
 				readonly={selected instanceof RemoteFile}
 				selectable={$commitBoxOpen && !isUnapplied}
 				on:close={() => {
