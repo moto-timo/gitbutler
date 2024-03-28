@@ -88,7 +88,11 @@
 		border-radius: var(--radius-s);
 		border: 1px solid var(--clr-theme-container-light);
 		&:hover {
-			background: color-mix(in srgb, var(--clr-theme-container-light), var(--darken-tint-light));
+			background: color-mix(
+				in srgb,
+				var(--clr-theme-container-light),
+				var(--darken-tint-light)
+			);
 
 			& .chevron-icon {
 				opacity: 0.7;

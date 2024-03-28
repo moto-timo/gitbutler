@@ -65,6 +65,7 @@
 	use:draggable={{
 		...draggableFile(branchId, file, selectedFiles),
 		disabled: readonly || isUnapplied,
+		viewportId: 'board-viewport',
 		selector: '.selected-draggable'
 	}}
 	on:click
@@ -77,7 +78,12 @@
 	role="button"
 	tabindex="0"
 >
-	<div class="tree-list-file" class:selected role="listitem" on:contextmenu|preventDefault>
+	<div
+		class="tree-list-file"
+		class:selected-draggable={selected}
+		role="listitem"
+		on:contextmenu|preventDefault
+	>
 		<div class="content-wrapper">
 			{#if showCheckbox}
 				<Checkbox
@@ -86,15 +92,22 @@
 					{indeterminate}
 					on:change={(e) => {
 						selectedOwnership.update((ownership) => {
-							if (e.detail) file.hunks.forEach((h) => ownership.addHunk(file.id, h.id));
-							if (!e.detail) file.hunks.forEach((h) => ownership.removeHunk(file.id, h.id));
+							if (e.detail)
+								file.hunks.forEach((h) => ownership.addHunk(file.id, h.id));
+							if (!e.detail)
+								file.hunks.forEach((h) => ownership.removeHunk(file.id, h.id));
 							return ownership;
 						});
 					}}
 				/>
 			{/if}
 			<div class="name-wrapper">
-				<img src={getVSIFileIcon(file.path)} alt="js" style="width: var(--size-12)" class="icon" />
+				<img
+					src={getVSIFileIcon(file.path)}
+					alt="js"
+					style="width: var(--size-12)"
+					class="icon"
+				/>
 				<span class="name text-base-12">
 					{file.filename}
 				</span>
@@ -120,8 +133,8 @@
 		max-width: 100%;
 		outline: none;
 		background: var(--clr-theme-container-light);
-		border: 1px solid var(--clr-theme-container-light);
-		&:not(.selected):hover {
+		border: 1px solid transparent;
+		&:not(.selected-draggable):hover {
 			background-color: color-mix(
 				in srgb,
 				var(--clr-theme-container-light),
@@ -148,11 +161,16 @@
 		overflow: hidden;
 		white-space: nowrap;
 	}
-	.selected {
+	.selected-draggable {
 		background-color: var(--clr-theme-scale-pop-80);
+		border: 1px solid var(--clr-theme-container-light);
 
 		&:hover {
-			background-color: color-mix(in srgb, var(--clr-theme-scale-pop-80), var(--darken-extralight));
+			background-color: color-mix(
+				in srgb,
+				var(--clr-theme-scale-pop-80),
+				var(--darken-extralight)
+			);
 		}
 	}
 </style>
