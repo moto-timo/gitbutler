@@ -12,7 +12,7 @@ import { writable, type Readable, type Writable } from 'svelte/store';
 /**
  * Getter that returns an instance of the parameter type
  */
-export function getContextByClass<T extends new (...args: any) => InstanceType<T>>(
+export function getContext<T extends new (...args: any) => InstanceType<T>>(
 	key: T
 ): InstanceType<T> {
 	const instance = svelteGetContext<InstanceType<T> | undefined>(key);
@@ -43,8 +43,8 @@ export function getContextStore<
 /**
  * Generic getter for store by symbol, e.g. for distinguishing local and remote commit lists.
  */
-export function getContextStoreBySymbol<T>(key: symbol): Readable<T> {
-	const instance = svelteGetContext<Readable<T> | undefined>(key);
+export function getContextStoreBySymbol<T, S extends Readable<T> = Readable<T>>(key: symbol): S {
+	const instance = svelteGetContext<S | undefined>(key);
 	if (!instance) throw new Error(`no instance of \`Readable<${key.toString}[]>\` in context`);
 	return instance;
 }

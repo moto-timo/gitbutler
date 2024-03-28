@@ -16,7 +16,7 @@
 		persistedCommitMessage
 	} from '$lib/config/config';
 	import { splitMessage } from '$lib/utils/commitMessage';
-	import { getContextByClass, getContextStore } from '$lib/utils/context';
+	import { getContext, getContextStore } from '$lib/utils/context';
 	import * as toasts from '$lib/utils/toasts';
 	import { tooltip } from '$lib/utils/tooltip';
 	import { setAutoHeight } from '$lib/utils/useAutoHeight';
@@ -29,7 +29,7 @@
 	import { fly, slide } from 'svelte/transition';
 	import type { Writable } from 'svelte/store';
 
-	const aiService = getContextByClass(AIService);
+	const aiService = getContext(AIService);
 
 	const dispatch = createEventDispatcher<{
 		action: 'generate-branch-name';
@@ -38,7 +38,7 @@
 	export let projectId: string;
 	export let expanded: Writable<boolean>;
 
-	const branchController = getContextByClass(BranchController);
+	const branchController = getContext(BranchController);
 	const selectedOwnership = getContextStore(Ownership);
 	const branch = getContextStore(Branch);
 	const user = getContextStore(User);

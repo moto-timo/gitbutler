@@ -5,7 +5,7 @@
 	import { BranchService } from '$lib/branches/service';
 	import ViewPrContextMenu from '$lib/components/ViewPrContextMenu.svelte';
 	import { GitHubService } from '$lib/github/service';
-	import { getContextByClass } from '$lib/utils/context';
+	import { getContext } from '$lib/utils/context';
 	import { createTimeAgoStore } from '$lib/utils/timeAgo';
 	import * as toasts from '$lib/utils/toasts';
 	import { openExternalUrl } from '$lib/utils/url';
@@ -16,14 +16,14 @@
 	import type { Readable } from 'svelte/store';
 
 	export let isLaneCollapsed: boolean;
-	const branchService = getContextByClass(BranchService);
+	const branchService = getContext(BranchService);
 	export let branchName: string | undefined;
 	export let projectId: string;
 	export let isUnapplied = false;
 
-	const baseBranchService = getContextByClass(BaseBranchService);
+	const baseBranchService = getContext(BaseBranchService);
 
-	const githubService = getContextByClass(GitHubService);
+	const githubService = getContext(GitHubService);
 
 	let isMerging = false;
 	let isFetchingChecks = false;

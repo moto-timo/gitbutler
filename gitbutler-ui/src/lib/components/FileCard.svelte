@@ -2,7 +2,7 @@
 	import FileCardHeader from './FileCardHeader.svelte';
 	import FileDiff from './FileDiff.svelte';
 	import ScrollableContainer from '$lib/components/ScrollableContainer.svelte';
-	import { getContextByClass } from '$lib/utils/context';
+	import { getContext } from '$lib/utils/context';
 	import { ContentSection, HunkSection, parseFileSections } from '$lib/utils/fileSections';
 	import { BranchController } from '$lib/vbranches/branchController';
 	import type { AnyFile } from '$lib/vbranches/types';
@@ -14,7 +14,7 @@
 	export let selectable = false;
 	export let readonly = false;
 
-	const branchController = getContextByClass(BranchController);
+	const branchController = getContext(BranchController);
 
 	let sections: (HunkSection | ContentSection)[] = [];
 

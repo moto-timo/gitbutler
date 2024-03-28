@@ -1,8 +1,6 @@
 import type { Commit } from './types';
 
-export function getLockText(commitId: string[], commits: Commit[]): string;
-export function getLockText(commitId: string, commits: Commit[]): string;
-export function getLockText(commitId: any, commits: Commit[]): string {
+export function getLockText(commitId: string[] | string, commits: Commit[]): string {
 	if (!commitId || commits === undefined) return 'Depends on a committed change';
 
 	const lockedIds = typeof commitId == 'string' ? [commitId] : (commitId as string[]);

@@ -26,15 +26,15 @@
 	} from '$lib/dragging/draggables';
 	import { dropzone } from '$lib/dragging/dropzone';
 	import { persisted } from '$lib/persisted/persisted';
-	import { SETTINGS_CONTEXT, type SettingsStore } from '$lib/settings/userSettings';
-	import { getContextByClass, getContextStore } from '$lib/utils/context';
+	import { SETTINGS, type Settings } from '$lib/settings/userSettings';
+	import { getContext, getContextStore, getContextStoreBySymbol } from '$lib/utils/context';
 	import { computeAddedRemovedByFiles } from '$lib/utils/metrics';
 	import * as toasts from '$lib/utils/toasts';
 	import { BranchController } from '$lib/vbranches/branchController';
 	import { filesToOwnership } from '$lib/vbranches/ownership';
 	import { Branch, type LocalFile } from '$lib/vbranches/types';
 	import lscache from 'lscache';
-	import { getContext, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { get, type Writable } from 'svelte/store';
 	import type { Persisted } from '$lib/persisted/persisted';
 
@@ -43,9 +43,9 @@
 	export let isLaneCollapsed: Persisted<boolean>;
 	export let commitBoxOpen: Writable<boolean>;
 
-	const branchController = getContextByClass(BranchController);
+	const branchController = getContext(BranchController);
 	const branchStore = getContextStore(Branch);
-	const project = getContextByClass(Project);
+	const project = getContext(Project);
 	const user = getContextStore(User);
 
 	$: branch = $branchStore;
@@ -53,9 +53,9 @@
 	const aiGenEnabled = projectAiGenEnabled(project.id);
 	const aiGenAutoBranchNamingEnabled = projectAiGenAutoBranchNamingEnabled(project.id);
 
-	const aiService = getContextByClass(AIService);
+	const aiService = getContext(AIService);
 
-	const userSettings = getContext<SettingsStore>(SETTINGS_CONTEXT);
+	const userSettings = getContextStoreBySymbol<Settings>(SETTINGS);
 	const defaultBranchWidthRem = persisted<number>(24, 'defaulBranchWidth' + project.id);
 	const laneWidthKey = 'laneWidth_';
 	const newVbranchNameRegex = /^virtual\sbranch\s*[\d]*$/;

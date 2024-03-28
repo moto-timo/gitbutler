@@ -5,7 +5,7 @@
 	import { BranchService } from '$lib/branches/service';
 	import Button from '$lib/components/Button.svelte';
 	import { GitHubService } from '$lib/github/service';
-	import { getContextByClass, getContextStore } from '$lib/utils/context';
+	import { getContext, getContextStore } from '$lib/utils/context';
 	import { BranchController } from '$lib/vbranches/branchController';
 	import { BaseBranch, Branch, type CommitStatus } from '$lib/vbranches/types';
 	import toast from 'svelte-french-toast';
@@ -15,10 +15,10 @@
 	export let isUnapplied: boolean;
 	export let hasCommits: boolean;
 
-	const branchService = getContextByClass(BranchService);
-	const githubService = getContextByClass(GitHubService);
-	const branchController = getContextByClass(BranchController);
-	const promptService = getContextByClass(PromptService);
+	const branchService = getContext(BranchService);
+	const githubService = getContext(GitHubService);
+	const branchController = getContext(BranchController);
+	const promptService = getContext(PromptService);
 	const baseBranch = getContextStore(BaseBranch);
 	const branch = getContextStore(Branch);
 

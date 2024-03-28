@@ -5,9 +5,9 @@
 	import Resizer from '$lib/components/Resizer.svelte';
 	import { projectLaneCollapsed } from '$lib/config/config';
 	import { persisted } from '$lib/persisted/persisted';
-	import { SETTINGS_CONTEXT, type SettingsStore } from '$lib/settings/userSettings';
+	import { SETTINGS, type Settings } from '$lib/settings/userSettings';
 	import { getRemoteBranchData } from '$lib/stores/remoteBranches';
-	import { getContextByClass, setContextStore } from '$lib/utils/context';
+	import { getContext, getContextStoreBySymbol, setContextStore } from '$lib/utils/context';
 	import { Ownership } from '$lib/vbranches/ownership';
 	import {
 		RemoteFile,
@@ -20,7 +20,6 @@
 		UNKNOWN_COMMITS
 	} from '$lib/vbranches/types';
 	import lscache from 'lscache';
-	import { getContext } from 'svelte';
 	import { quintOut } from 'svelte/easing';
 	import { writable } from 'svelte/store';
 	import { slide } from 'svelte/transition';
@@ -58,7 +57,8 @@
 		setContextStore(UNKNOWN_COMMITS, unknownCommits);
 	}
 
-	const project = getContextByClass(Project);
+	const project = getContext(Project);
+	const userSettings = getContextStoreBySymbol<Settings>(SETTINGS);
 	const selectedFiles = writable<LocalFile[]>([]);
 
 	let rsViewport: HTMLElement;
@@ -67,8 +67,6 @@
 	const defaultFileWidthRem = persisted<number | undefined>(30, 'defaulFileWidth' + project.id);
 	const fileWidthKey = 'fileWidth_';
 	let fileWidth: number;
-
-	const userSettings = getContext<SettingsStore>(SETTINGS_CONTEXT);
 
 	fileWidth = lscache.get(fileWidthKey + branch.id);
 

@@ -11,7 +11,7 @@
 		isDraggableCommit
 	} from '$lib/dragging/draggables';
 	import { dropzone } from '$lib/dragging/dropzone';
-	import { getContextByClass, getContextStore } from '$lib/utils/context';
+	import { getContext, getContextStore } from '$lib/utils/context';
 	import { BranchController } from '$lib/vbranches/branchController';
 	import { filesToOwnership } from '$lib/vbranches/ownership';
 	import {
@@ -29,9 +29,9 @@
 	export let isUnapplied = false;
 	export let selectedFiles: Writable<AnyFile[]>;
 
-	const branchController = getContextByClass(BranchController);
+	const branchController = getContext(BranchController);
 	const baseBranch = getContextStore(BaseBranch);
-	const project = getContextByClass(Project);
+	const project = getContext(Project);
 	const branch = getContextStore(Branch);
 
 	function acceptAmend(commit: Commit | RemoteCommit) {

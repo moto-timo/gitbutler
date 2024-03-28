@@ -6,7 +6,7 @@
 	import { clickOutside } from '$lib/clickOutside';
 	import Button from '$lib/components/Button.svelte';
 	import Icon from '$lib/components/Icon.svelte';
-	import { getContextByClass, getContextStore } from '$lib/utils/context';
+	import { getContext, getContextStore } from '$lib/utils/context';
 	import * as toasts from '$lib/utils/toasts';
 	import { BranchController } from '$lib/vbranches/branchController';
 	import { Branch } from '$lib/vbranches/types';
@@ -18,7 +18,7 @@
 	export let projectId: string;
 	export let isLaneCollapsed: Persisted<boolean>;
 
-	const branchController = getContextByClass(BranchController);
+	const branchController = getContext(BranchController);
 	const branchStore = getContextStore(Branch);
 	$: branch = $branchStore;
 

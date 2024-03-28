@@ -4,8 +4,8 @@
 	import FullviewLoading from '$lib/components/FullviewLoading.svelte';
 	import Resizer from '$lib/components/Resizer.svelte';
 	import ScrollableContainer from '$lib/components/ScrollableContainer.svelte';
-	import { SETTINGS_CONTEXT, type Settings } from '$lib/settings/userSettings';
-	import { getContextByClass, getContextStoreBySymbol, setContextStore } from '$lib/utils/context';
+	import { SETTINGS, type Settings } from '$lib/settings/userSettings';
+	import { getContext, getContextStoreBySymbol, setContextStore } from '$lib/utils/context';
 	import { BaseBranchService } from '$lib/vbranches/branchStoresCache';
 	import { Ownership } from '$lib/vbranches/ownership';
 	import lscache from 'lscache';
@@ -16,9 +16,9 @@
 	const defaultBranchWidthRem = 30;
 	const laneWidthKey = 'historyLaneWidth';
 	const selectedFiles = writable<AnyFile[]>([]);
-	const userSettings = getContextStoreBySymbol<Settings>(SETTINGS_CONTEXT);
+	const userSettings = getContextStoreBySymbol<Settings>(SETTINGS);
 
-	const baseBranchService = getContextByClass(BaseBranchService);
+	const baseBranchService = getContext(BaseBranchService);
 	const baseBranch = baseBranchService.base;
 
 	let rsViewport: HTMLDivElement;

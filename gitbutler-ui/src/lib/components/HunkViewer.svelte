@@ -6,10 +6,10 @@
 	import { Project } from '$lib/backend/projects';
 	import { draggable } from '$lib/dragging/draggable';
 	import { draggableHunk } from '$lib/dragging/draggables';
-	import { SETTINGS_CONTEXT, type SettingsStore } from '$lib/settings/userSettings';
-	import { getContextByClass, getContextStore } from '$lib/utils/context';
+	import { getContext, getContextStore, getContextStoreBySymbol } from '$lib/utils/context';
 	import { Ownership } from '$lib/vbranches/ownership';
-	import { getContext, onDestroy } from 'svelte';
+	import { onDestroy } from 'svelte';
+	import { SETTINGS, type Settings } from '$lib/settings/userSettings';
 	import type { HunkSection } from '$lib/utils/fileSections';
 	import type { Hunk } from '$lib/vbranches/types';
 	import type { Writable } from 'svelte/store';
@@ -27,8 +27,8 @@
 	export let linesModified: number;
 
 	const selectedOwnership: Writable<Ownership> = getContextStore(Ownership);
-	const userSettings = getContext(SETTINGS_CONTEXT) as SettingsStore;
-	const project = getContextByClass(Project);
+	const userSettings = getContextStoreBySymbol<Settings>(SETTINGS);
+	const project = getContext(Project);
 
 	function onHunkSelected(hunk: Hunk, isSelected: boolean) {
 		if (!selectedOwnership) return;

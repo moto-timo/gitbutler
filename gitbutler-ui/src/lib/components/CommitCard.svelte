@@ -6,7 +6,7 @@
 	import { persistedCommitMessage } from '$lib/config/config';
 	import { draggable } from '$lib/dragging/draggable';
 	import { draggableCommit, nonDraggable } from '$lib/dragging/draggables';
-	import { getContextByClass, getContextStore } from '$lib/utils/context';
+	import { getContext, getContextStore } from '$lib/utils/context';
 	import { openExternalUrl } from '$lib/utils/url';
 	import { BranchController } from '$lib/vbranches/branchController';
 	import { listRemoteCommitFiles } from '$lib/vbranches/remoteCommits';
@@ -28,9 +28,9 @@
 	export let isUnapplied = false;
 	export let selectedFiles: Writable<(LocalFile | RemoteFile)[]>;
 
-	const branchController = getContextByClass(BranchController);
+	const branchController = getContext(BranchController);
 	const baseBranch = getContextStore(BaseBranch);
-	const project = getContextByClass(Project);
+	const project = getContext(Project);
 
 	const currentCommitMessage = persistedCommitMessage(project.id, branch?.id || '');
 

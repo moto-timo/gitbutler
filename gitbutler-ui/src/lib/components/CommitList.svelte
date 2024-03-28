@@ -2,7 +2,7 @@
 	import CommitListFooter from './CommitListFooter.svelte';
 	import CommitListHeader from './CommitListHeader.svelte';
 	import CommitListItem from './CommitListItem.svelte';
-	import { getContextByClass, getContextStore } from '$lib/utils/context';
+	import { getContext, getContextStore } from '$lib/utils/context';
 	import { VirtualBranchService } from '$lib/vbranches/branchStoresCache';
 	import {
 		Branch,
@@ -19,7 +19,7 @@
 	export let isUnapplied: boolean;
 	export let commits: Commit[] | RemoteCommit[];
 
-	const branchService = getContextByClass(VirtualBranchService);
+	const branchService = getContext(VirtualBranchService);
 	const branch = getContextStore(Branch);
 
 	let headerHeight: number;
