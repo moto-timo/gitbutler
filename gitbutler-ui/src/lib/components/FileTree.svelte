@@ -5,6 +5,7 @@
 <script lang="ts">
 	import TreeListFile from './TreeListFile.svelte';
 	import TreeListFolder from './TreeListFolder.svelte';
+	import { selectFilesInList } from '$lib/utils/selectFilesInList';
 	import { maybeMoveSelection } from '$lib/utils/selection';
 	import type { TreeNode } from '$lib/vbranches/filetree';
 	import type { Ownership } from '$lib/vbranches/ownership';
@@ -21,7 +22,7 @@
 	export let isUnapplied: boolean;
 	export let allowMultiple = false;
 	export let readonly = false;
-	export let files: LocalFile[] | RemoteFile[];
+	export let sortedFiles: LocalFile[] | RemoteFile[];
 
 	function isNodeChecked(selectedOwnership: Ownership, node: TreeNode): boolean {
 		if (node.file) {
@@ -79,7 +80,7 @@
 					{isUnapplied}
 					{readonly}
 					{allowMultiple}
-					{files}
+					{sortedFiles}
 					on:checked
 					on:unchecked
 				/>
@@ -99,21 +100,11 @@
 		{readonly}
 		showCheckbox={showCheckboxes}
 		on:click={(e) => {
-			e.stopPropagation();
-			const isAlreadySelected = $selectedFiles.includes(file);
-			if (isAlreadySelected && e.shiftKey) {
-				selectedFiles.update((fileIds) => fileIds.filter((f) => f.id != file.id));
-			} else if (isAlreadySelected) {
-				$selectedFiles = [];
-			} else if (e.shiftKey && allowMultiple) {
-				selectedFiles.update((files) => [file, ...files]);
-			} else {
-				$selectedFiles = [file];
-			}
+			$selectedFiles = selectFilesInList(e, file, $selectedFiles, sortedFiles, allowMultiple);
 		}}
 		on:keydown={(e) => {
 			e.preventDefault();
-			maybeMoveSelection(e.key, files, selectedFiles);
+			maybeMoveSelection(e.key, sortedFiles, selectedFiles);
 		}}
 	/>
 {:else if node.children.length > 0}
@@ -146,7 +137,7 @@
 						{isUnapplied}
 						{readonly}
 						{allowMultiple}
-						{files}
+						{sortedFiles}
 						on:checked
 						on:unchecked
 					/>

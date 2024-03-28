@@ -92,7 +92,7 @@
 			background-color: color-mix(
 				in srgb,
 				var(--clr-theme-container-light),
-				var(--darken-tint-mid)
+				var(--darken-tint-light)
 			);
 			outline: none;
 		}
@@ -114,7 +114,7 @@
 			background-color: color-mix(
 				in srgb,
 				var(--clr-theme-container-light),
-				var(--darken-tint-mid)
+				var(--darken-tint-light)
 			);
 		}
 	}
