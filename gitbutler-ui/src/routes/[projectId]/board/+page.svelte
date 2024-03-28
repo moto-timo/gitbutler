@@ -46,7 +46,7 @@
 		</div>
 	{/if}
 	<div class="board-wrapper">
-		<div class="scroll-viewport hide-native-scrollbar" bind:this={viewport}>
+		<div id="board-viewport" class="scroll-viewport hide-native-scrollbar" bind:this={viewport}>
 			<div class="scroll-contents" bind:this={contents}>
 				<Board branches={$activeBranches$} branchesError={$error$} />
 			</div>
